@@ -11,20 +11,31 @@ from releases.serializers import ReleaseOrderSerializer
 # print(serializer.validated_data)
 # print(serializer.errors)
 
-def test_status_is_read_only(self):
-    data = self.build_valid_data()
-    data["status"] = ReleaseOrder.Status.SUCCESS
 
-    serializer = ReleaseOrderSerializer(data=data)
+class ReleaseOrderSerializerTest(TestCase):
 
-    self.assertTrue(
-        serializer.is_valid(),
-        serializer.errors,
-    )
+    def build_valid_data(self):
+        return {
+            "app_code": "app_code",
+            "app_name": "app_name",
+            "env_name": "env_name",
+            "branch_name": "branch_name",
+            "jenkins_job_name": "jenkins_job_name",
+        }
+    def test_status_is_read_only(self):
+        data = self.build_valid_data()
+        data["status"] = ReleaseOrder.Status.SUCCESS
 
-    order = serializer.save()
+        serializer = ReleaseOrderSerializer(data=data)
 
-    self.assertEqual(
-        order.status,
-        ReleaseOrder.Status.CREATED,
-    )
+        self.assertTrue(
+            serializer.is_valid(),
+            serializer.errors,
+        )
+
+        order = serializer.save()
+
+        self.assertEqual(
+            order.status,
+            ReleaseOrder.Status.CREATED,
+        )

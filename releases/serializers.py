@@ -36,17 +36,17 @@ class ReleaseOrderSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
 
-    
 
-    def validate_status(self, attrs):
-        return attrs
+    def validate_app_code(self, value):
+        value = value.strip()
+        if " " in value:
+            raise serializers.ValidationError("应用编码不能为空")
+        return value
 
     def validate_branch_name(self, value):
         value = value.strip()
         if " " in value:
-            raise serializers.ValidationError("分支名不能为空")
-        if not value.startswith("release"):
-            raise serializers.ValidationError("分支名必须以release开头")
+            raise serializers.ValidationError("分支名不能包含空格")
         return value
 
     # 这里不能写在validate_branch_name()中，原因是这个是全局的提交验证，不是单个字段的验证
@@ -59,6 +59,7 @@ class ReleaseOrderSerializer(serializers.ModelSerializer):
             and not branch_name.startswith("release/")
         ):
             raise serializers.ValidationError("分支名必须以release或master开头")
+        return attrs
 
     # read_only_fields有用，简单来说就是只返回，不能提交
     # 怎么写测试验证？那需要写view和url才行吧？
