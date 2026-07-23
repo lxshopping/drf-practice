@@ -16,6 +16,7 @@ class ReleaseOrderSerializerTest(TestCase):
 
     def build_valid_data(self):
         return {
+            "release_no": "release_no",
             "app_code": "app_code",
             "app_name": "app_name",
             "env_name": "env_name",

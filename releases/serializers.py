@@ -38,9 +38,9 @@ class ReleaseOrderSerializer(serializers.ModelSerializer):
 
 
     def validate_app_code(self, value):
-        value = value.strip()
+        value = value.lower().strip()
         if " " in value:
-            raise serializers.ValidationError("应用编码不能为空")
+            raise serializers.ValidationError("应用编码包含空格")
         return value
 
     def validate_branch_name(self, value):
