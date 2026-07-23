@@ -1,0 +1,247 @@
+{
+  "info": {
+    "_postman_id": "7a0a0d8f-1e76-4d33-a2a3-2d40c76e0724",
+    "name": "drf-practice",
+    "description": "DRF 发布中心每日练习。先看任务文档中的预期，再手工执行请求并记录真实结果。",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Day01 - Serializer 核心",
+      "description": "接口：http://127.0.0.1:8000/api/release-orders/",
+      "item": [
+        {
+          "name": "01 合法生产发布单：规范化 app_code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"release_no\": \"RO-D01-{{$guid}}\",\n  \"app_code\": \" DMS-MDM \",\n  \"app_name\": \"主数据服务\",\n  \"env_name\": \"prod\",\n  \"branch_name\": \"release/v1\",\n  \"jenkins_job_name\": \"dms-mdm-pipeline\",\n  \"status\": \"SUCCESS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/release-orders/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "release-orders",
+                ""
+              ]
+            },
+            "description": "预期 201；响应 app_code 为 dms-mdm；status 为 CREATED。"
+          },
+          "response": []
+        },
+        {
+          "name": "02 只读 status 不可覆盖",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"release_no\": \"RO-D01-STATUS-{{$guid}}\",\n  \"app_code\": \"dms-mdm\",\n  \"app_name\": \"主数据服务\",\n  \"env_name\": \"prod\",\n  \"branch_name\": \"release/v1\",\n  \"jenkins_job_name\": \"dms-mdm-pipeline\",\n  \"status\": \"SUCCESS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/release-orders/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "release-orders",
+                ""
+              ]
+            },
+            "description": "预期 201；虽然输入 SUCCESS，响应与数据库状态仍为 CREATED。"
+          },
+          "response": []
+        },
+        {
+          "name": "03 app_code 含内部空格",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"release_no\": \"RO-D01-APPCODE-{{$guid}}\",\n  \"app_code\": \"dms mdm\",\n  \"app_name\": \"主数据服务\",\n  \"env_name\": \"prod\",\n  \"branch_name\": \"release/v1\",\n  \"jenkins_job_name\": \"dms-mdm-pipeline\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/release-orders/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "release-orders",
+                ""
+              ]
+            },
+            "description": "预期 400；错误归属 app_code。"
+          },
+          "response": []
+        },
+        {
+          "name": "04 prod 使用 feature 分支",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"release_no\": \"RO-D01-PROD-{{$guid}}\",\n  \"app_code\": \"dms-mdm\",\n  \"app_name\": \"主数据服务\",\n  \"env_name\": \"prod\",\n  \"branch_name\": \"feature/test\",\n  \"jenkins_job_name\": \"dms-mdm-pipeline\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/release-orders/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "release-orders",
+                ""
+              ]
+            },
+            "description": "预期 400；由对象级 validate() 拒绝。"
+          },
+          "response": []
+        },
+        {
+          "name": "05 prod 使用 master",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"release_no\": \"RO-D01-MASTER-{{$guid}}\",\n  \"app_code\": \"dms-mdm\",\n  \"app_name\": \"主数据服务\",\n  \"env_name\": \"prod\",\n  \"branch_name\": \"master\",\n  \"jenkins_job_name\": \"dms-mdm-pipeline\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/release-orders/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "release-orders",
+                ""
+              ]
+            },
+            "description": "预期 201。"
+          },
+          "response": []
+        },
+        {
+          "name": "06 test 使用 feature 分支",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"release_no\": \"RO-D01-TEST-{{$guid}}\",\n  \"app_code\": \"dms-mdm\",\n  \"app_name\": \"主数据服务\",\n  \"env_name\": \"test\",\n  \"branch_name\": \"feature/test\",\n  \"jenkins_job_name\": \"dms-mdm-pipeline\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/release-orders/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "release-orders",
+                ""
+              ]
+            },
+            "description": "预期 201；非生产环境允许 feature 分支。"
+          },
+          "response": []
+        },
+        {
+          "name": "07 GET 列表检查 status_display",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/release-orders/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "release-orders",
+                ""
+              ]
+            },
+            "description": "预期 200；每条记录同时包含 status 与 status_display。"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    }
+  ]
+}
