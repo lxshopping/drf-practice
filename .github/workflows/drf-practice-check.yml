@@ -39,6 +39,10 @@ jobs:
       - name: Django system check
         run: python manage.py check
 
+      - name: Verify active practice entrypoint
+        run: |
+          python manage.py shell -c "from releases.views import ReleaseOrderViewSet; module = ReleaseOrderViewSet.serializer_class.__module__; print(f'active practice module: {module}'); assert module.startswith('releases.practice.day'), module"
+
       - name: Check missing migrations
         run: python manage.py makemigrations --check --dry-run
 
