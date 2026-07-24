@@ -1,11 +1,11 @@
 from rest_framework import viewsets
 
 from releases.models import ReleaseOrder
-from releases.serializers import ReleaseOrderSerializer
+from releases.practice.day01_serializer import Day01ReleaseOrderSerializer
 
 
 class ReleaseOrderViewSet(viewsets.ModelViewSet):
-    """Day01 的 HTTP 测试入口；练习重点仍是 Serializer。"""
+    """当前活动练习的 HTTP 入口；每天只切换 serializer_class 的来源。"""
 
     queryset = ReleaseOrder.objects.all()
-    serializer_class = ReleaseOrderSerializer
+    serializer_class = Day01ReleaseOrderSerializer
