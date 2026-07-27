@@ -31,7 +31,8 @@ class Day01ReleaseOrderSerializer(serializers.ModelSerializer):
     # [HINT-3] 先确认 source 应指向模型实例上的“展示方法”，不是数据库字段本身。
     # [SOURCE] 完成后只追 Serializer.to_representation()。
     # [BASELINE] 这里故意返回原始 status，等待你修正。
-    status_display = serializers.CharField(source="status", read_only=True)
+    status_display = serializers.CharField(source="get_status_display", read_only=True)
+
 
     class Meta:
         model = ReleaseOrder
@@ -43,8 +44,8 @@ class Day01ReleaseOrderSerializer(serializers.ModelSerializer):
         # [HINT-3] 先按“业务输入 / 后端状态 / 时间与错误信息”三组整理字段，再写清单。
         # [SOURCE] 完成后解释为什么只读字段不在 _writable_fields 中。
         # [BASELINE] 以下配置故意不完整，但能保证项目正常启动。
-        fields = "__all__"
-        read_only_fields = ["id"]
+        fields = ["id", "status_display","release_no", "app_code", "app_name", "env_name", "branch_name", "jenkins_job_name","status", "started_at", "finished_at", "error_message", "created_at", "updated_at"]
+        read_only_fields = ["status", "started_at", "finished_at", "error_message", "created_at", "updated_at"]
 
     def validate_app_code(self, value):
         # [TASK 3] 规范化 app_code，并拒绝内部仍含空格的值。
@@ -54,6 +55,9 @@ class Day01ReleaseOrderSerializer(serializers.ModelSerializer):
         # [HINT-2] 注意处理顺序：先规范化，再判断规范化后的值。
         # [HINT-3] 用一个局部 value 依次完成去首尾空白、大小写统一、内部空格判断。
         # [SOURCE] 卡住时定位 Field.run_validation()，不要通读整个 serializers.py。
+        value = value.strip().lower()
+        if " " in value:
+            raise serializers.ValidationError("应用编码包含空格")
         return value
 
     def validate_branch_name(self, value):
@@ -62,6 +66,9 @@ class Day01ReleaseOrderSerializer(serializers.ModelSerializer):
         # [HINT-1] 此处只处理 branch_name 自身，不判断 prod/test。
         # [HINT-2] 需要 env_name 才能判断的规则应留给 validate(attrs)。
         # [HINT-3] 本方法只做“规范化后的 branch_name 是否仍含空格”这一件事。
+        value = value.strip()
+        if " " in value:
+            raise serializers.ValidationError("分支名不能包含空格")
         return value
 
     def validate(self, attrs):
@@ -76,6 +83,14 @@ class Day01ReleaseOrderSerializer(serializers.ModelSerializer):
         # [HINT-3] 报错条件由三项同时成立：prod、不是 master、也不是 release/ 前缀。
         # [WHY] 完成后在总结中说明为什么此规则不能放进 validate_branch_name()。
         # [SOURCE] 只追 Serializer.run_validation() 与 to_internal_value() 的调用顺序。
+        env_name = attrs["env_name"]
+        branch_name = attrs["branch_name"]
+        if (
+            env_name == "prod" 
+            and branch_name != "master" 
+            and not branch_name.startswith("release/")
+        ):
+            raise serializers.ValidationError("分支名必须以release或master开头")
         return attrs
 
 

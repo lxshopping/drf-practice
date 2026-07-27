@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
 from releases.models import ReleaseOrder
-from releases.practice.day01_serializer import Day01ReleaseOrderSerializer
+from .practice.day01_serializer import Day01ReleaseOrderSerializer
 
 
 class ReleaseOrderViewSet(viewsets.ModelViewSet):
