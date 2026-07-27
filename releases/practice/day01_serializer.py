@@ -28,6 +28,7 @@ class Day01ReleaseOrderSerializer(serializers.ModelSerializer):
     # [CHECK] 先执行 Postman 场景 07；CREATED 对应的展示值应为“待触发”。
     # [HINT-1] 这是输出字段，应声明在 Serializer 类中，而不是 Meta 中。
     # [HINT-2] Django choices 模型实例自带 get_<字段名>_display()。
+    # [HINT-3] 先确认 source 应指向模型实例上的“展示方法”，不是数据库字段本身。
     # [SOURCE] 完成后只追 Serializer.to_representation()。
     # [BASELINE] 这里故意返回原始 status，等待你修正。
     status_display = serializers.CharField(source="status", read_only=True)
@@ -39,6 +40,7 @@ class Day01ReleaseOrderSerializer(serializers.ModelSerializer):
         # [CHECK] 执行 Postman 场景 02：输入 status=SUCCESS，保存后仍应为 CREATED。
         # [HINT-1] status、执行时间、错误信息和时间戳由后端维护。
         # [HINT-2] fields 决定输入/输出边界；read_only_fields 决定只输出、不接收。
+        # [HINT-3] 先按“业务输入 / 后端状态 / 时间与错误信息”三组整理字段，再写清单。
         # [SOURCE] 完成后解释为什么只读字段不在 _writable_fields 中。
         # [BASELINE] 以下配置故意不完整，但能保证项目正常启动。
         fields = "__all__"
@@ -50,6 +52,7 @@ class Day01ReleaseOrderSerializer(serializers.ModelSerializer):
         # [CHECK-B] 场景 03："dms mdm" 应返回 400，错误归属 app_code。
         # [HINT-1] 这是只依赖单字段的转换和校验，保留在 validate_app_code()。
         # [HINT-2] 注意处理顺序：先规范化，再判断规范化后的值。
+        # [HINT-3] 用一个局部 value 依次完成去首尾空白、大小写统一、内部空格判断。
         # [SOURCE] 卡住时定位 Field.run_validation()，不要通读整个 serializers.py。
         return value
 
@@ -58,6 +61,7 @@ class Day01ReleaseOrderSerializer(serializers.ModelSerializer):
         # [CHECK] 可把场景 04 的 branch_name 临时改为 "release /v1" 验证错误字段。
         # [HINT-1] 此处只处理 branch_name 自身，不判断 prod/test。
         # [HINT-2] 需要 env_name 才能判断的规则应留给 validate(attrs)。
+        # [HINT-3] 本方法只做“规范化后的 branch_name 是否仍含空格”这一件事。
         return value
 
     def validate(self, attrs):
@@ -69,6 +73,7 @@ class Day01ReleaseOrderSerializer(serializers.ModelSerializer):
         # [CHECK-C] 场景 06：test + feature/test -> 201。
         # [HINT-1] attrs 中已经是各字段完成字段级校验后的值。
         # [HINT-2] 用一句中文先写清“什么时候才报错”，再翻译成布尔表达式。
+        # [HINT-3] 报错条件由三项同时成立：prod、不是 master、也不是 release/ 前缀。
         # [WHY] 完成后在总结中说明为什么此规则不能放进 validate_branch_name()。
         # [SOURCE] 只追 Serializer.run_validation() 与 to_internal_value() 的调用顺序。
         return attrs
