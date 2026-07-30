@@ -5,6 +5,7 @@
 - 时间：09:00–11:00
 - 今天只做 Day01，不进入 Day02
 - 不要求补 Django 单元测试；验证方式为本地运行 + Postman + GitHub Check
+- Postman 结果无需填写文档、截图或上传；本地有问题时直接反馈
 
 ## 今天唯一主要入口
 
@@ -50,7 +51,7 @@ python manage.py runserver
 | 09:20–10:10 | 按 TASK 顺序完成；每完成一个只跑对应 CHECK | 业务规则逐项变绿 |
 | 10:10–10:30 | 跑完 7 个固定场景和 branch_name 变化验证 | 状态码与关键字段符合预期 |
 | 10:30–10:45 | 只追代码中标记的 SOURCE | 能说明输入校验链与输出链 |
-| 10:45–11:00 | 填结果、更新总结、commit、push | GitHub Check 通过并等待 Review |
+| 10:45–11:00 | 本地确认、commit、push | 无需上传 Postman 结果；GitHub Check 通过并等待 Review |
 
 ## 固定 Postman 场景
 
@@ -75,30 +76,20 @@ python manage.py runserver
 完成一个小点即可 push，不必等全部结束：
 
 ~~~bash
-git add releases/practice/day01_serializer.py docs/results/day01-postman.md
+git add releases/practice/day01_serializer.py
 git commit -m "practice(day01): finish <本次小目标>"
 git push
 ~~~
 
-最后再提交总结：
-
-~~~bash
-git add docs/day01-serializer-core.md docs/results/day01-postman.md
-git commit -m "docs(day01): finish serializer review"
-git push
-~~~
+Postman 只在本地执行：全部符合预期就直接结束；若有问题，直接反馈对应场景、请求体、实际状态码和错误响应。总结由 Work 在 Review 后补充，不要求学习者额外提交文档。
 
 ## Day01 验收标准
 
-- [ ] 代码文件中的 TASK 1~5 全部完成。
-- [ ] 7 个固定 Postman 场景均与预期一致。
-- [ ] branch_name 内部空格变化验证通过。
-- [ ] `python manage.py check` 通过。
-- [ ] `python manage.py makemigrations --check --dry-run` 无遗漏迁移。
-- [ ] GitHub Check 为绿色，并确认当前 Serializer 来自 `releases.practice.day01_serializer`。
-- [ ] `docs/results/day01-postman.md` 填写真实结果。
-- [ ] `docs/day01-serializer-core.md` 与当前代码一致。
-- [ ] 能口述 `to_internal_value() -> Field.run_validation() -> validate_<field>() -> validate()`。
-- [ ] Draft PR 中没有未解决的 `[BLOCKER]`。
+- [x] 代码文件中的 TASK 1~5 已完成。
+- [x] 学习者在本地执行 Postman；无问题无需上传结果，有问题直接反馈。
+- [x] branch_name 内部空格变化规则已实现。
+- [x] GitHub Check 为绿色，并确认当前 Serializer 来自 `releases.practice.day01_serializer`。
+- [x] Review 未发现阻塞当前 POST/GET 场景的代码问题。
+- [x] Draft PR 中没有未解决的 `[BLOCKER]`。
 
-未全部通过时继续当前分支，不创建 Day02。
+字段清单排版、错误提示精度和 PATCH 下的 `attrs[...]` 风险属于非阻塞改进，分别可顺手修正或留到 Day05。Day01 可以按新规则进入最终验收。
