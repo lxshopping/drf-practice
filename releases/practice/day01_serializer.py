@@ -4,7 +4,7 @@
 1. 只打开并修改本文件，不需要来回查看 Chat。
 2. 运行 `python manage.py runserver`。
 3. 在 Postman 中执行 Day01 场景；每完成一个 TASK，只重跑对应 CHECK。
-4. 填写 `docs/results/day01-postman.md`，然后 commit + push。
+4. 本地场景通过后直接 commit + push；无需上传测试结果，有问题时反馈请求和错误响应。
 
 本文件已经通过 `releases/views.py` 接入：
     http://127.0.0.1:8000/api/release-orders/
@@ -98,7 +98,7 @@ class Day01ReleaseOrderSerializer(serializers.ModelSerializer):
 # [ ] TASK 1~5 均已完成。
 # [ ] 7 个 Postman 固定场景均已执行。
 # [ ] branch_name 内部空格的变化验证已执行。
-# [ ] docs/results/day01-postman.md 已填写真实状态码和关键结果。
-# [ ] docs/day01-serializer-core.md 已与当前代码同步。
+# [ ] Postman 已在本地验证；无需上传结果，若失败则直接反馈请求和错误响应。
+# [ ] 总结由 Work 根据代码与 Review 补充，不作为学习者提交门槛。
 # [ ] python manage.py check 通过。
 # [ ] python manage.py makemigrations --check --dry-run 显示无遗漏迁移。
