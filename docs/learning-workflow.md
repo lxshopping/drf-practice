@@ -2,7 +2,7 @@
 
 ## 目标
 
-把每日准备、编码、Postman 验证、自动检查、逐行 Review 和最终验收都放进 GitHub。用户拉取分支后，首先打开当天的可运行代码文件，直接根据代码注释完成练习；任务文档只做索引和验收补充，不再作为主要操作入口。
+把每日准备、编码、本地 Postman 验证、自动检查、逐行 Review 和最终验收串成一个快速闭环。用户拉取分支后，首先打开当天的可运行代码文件，直接根据代码注释完成练习；任务文档只做索引和验收补充，不再作为主要操作入口。Postman 结果默认只保留在本地，不要求填写结果表、截图或上传响应。
 
 ## 固定分工
 
@@ -12,7 +12,7 @@
 | 当天代码文件 | 写明 TASK、CHECK、渐退式提示和源码入口，是用户当天唯一主要入口 |
 | 本地仓库 | 修改当天代码、启动 Django、用 Postman 边改边验、提交和 push |
 | GitHub Actions | 每次 push 做语法、Django system check、迁移检查，并确认练习文件已接入运行路径 |
-| Chat | 仅用于需要系统解释的概念，不作为每天练习的操作入口 |
+| Chat | 用于系统解释，以及本地 Postman 发现问题时直接反馈请求、响应和报错 |
 
 ## 分支与 PR 规则
 
@@ -30,7 +30,7 @@
 releases/practice/dayXX_topic.py      当天唯一主要入口，包含可运行占位代码和行内任务
 releases/views.py / releases/urls.py  只做必要接线，不包含核心答案
 docs/tasks/dayXX-*.md                 时间安排、入口索引和完整验收清单
-docs/results/dayXX-postman.md         Postman 真实结果模板
+docs/results/dayXX-postman.md         可选本地检查模板，不要求填写或提交
 postman/drf-practice...json           可直接执行的请求
 Draft PR                              逐行 Review 与最终验收入口
 ~~~
@@ -39,7 +39,7 @@ Draft PR                              逐行 Review 与最终验收入口
 
 1. 拉取后可导入，`python manage.py check` 能运行。
 2. 已接入当天真实 HTTP 接口，不能再次出现“文件存在但未被 import”的情况。
-3. 文件顶部直接写启动方式、接口地址和结果记录位置。
+3. 文件顶部直接写启动方式、接口地址和本地验证方式。
 4. 按顺序标注 `[TASK]`、`[CHECK]`、`[HINT-1/2/3]`、`[WHY]`、`[SOURCE]`。
 5. 占位实现必须明确标记 `[BASELINE]`，可以启动，但在完成任务前应有业务场景不通过。
 6. 只准备非核心接线和最小占位，不提前提交当天核心题目的完整答案。
@@ -89,21 +89,20 @@ Review 优先使用 PR 行内评论，不直接改学习者的核心答案：
   -> 根据评论继续修改
 ~~~
 
-GitHub Check 只负责“文件已接入且代码能安全启动”；业务结果仍以 Postman 真实记录为准。
+GitHub Check 负责确认文件已接入且代码能安全启动；业务结果由学习者在本地用 Postman 验证。无问题无需上传任何记录；有问题时直接反馈请求方法、URL、请求体、实际状态码和错误响应。
 
 ## 每日验收
 
-每一天必须同时具备：
+每一天的推进门槛简化为：
 
 - 当天核心代码已在指定练习文件完成。
 - 练习文件确实被当前 View/URL import 使用。
-- Postman 真实结果，不要求 Django 单元测试。
+- 学习者已在本地执行约定的 Postman 场景；未反馈问题即按本地验证通过处理，无需上传结果。
 - GitHub Check 绿色。
-- 总结文档与实际代码一致。
-- 至少一个变化题。
-- 只追踪与当日问题直接相关的源码。
-- 能口述当天关键调用链。
+- 至少一个变化题已完成。
 - Draft PR 中没有未解决的 `[BLOCKER]`。
+
+总结与知识点由 Work 根据代码、Review 和反馈补充，不再要求学习者先修改文档才能进入下一天。口述调用链和源码追踪用于强化掌握，不作为拖住进度的硬门槛。
 
 ## 用户每天只需执行
 
@@ -118,9 +117,9 @@ python manage.py runserver
 然后只打开任务文档最上方指定的 `releases/practice/dayXX_*.py`。完成一个小点后：
 
 ~~~bash
-git add releases/practice/dayXX_*.py docs/results/dayXX-postman.md
+git add releases/practice/dayXX_*.py
 git commit -m "practice(dayXX): <本次小目标>"
 git push
 ~~~
 
-不需要把 Git commit、响应或整份代码重新粘贴到 Chat；GitHub 会直接读取并 Review。
+不需要把 Git commit、Postman 结果或整份代码重新粘贴到 Chat；GitHub 会直接读取并 Review。本地验证失败时，只需直接反馈最小可复现请求和错误响应。
