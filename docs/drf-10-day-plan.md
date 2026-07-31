@@ -1,49 +1,62 @@
-# DRF 十个工作日业务主线
+# DRF 核心冲刺计划（十日计划压缩版）
 
 - 项目：`lxshopping/drf-practice`
-- 业务对象：发布中心 `ReleaseOrder`
-- 方法：业务驱动 + 渐退式提示 + 主动复写 + 本地 Postman 反馈 + 按需追踪源码
-- 每天：09:00–11:00
-- 规则：日期是最早开始日；任何一天未验收，后续整体顺延
-- 入口规则：每天先创建并接入一个带注释、可运行的代码练习文件；用户以该文件为主，不需要对着 Chat 或长任务文档操作
+- 业务主线：发布中心 `ReleaseOrder`
+- 目标：先形成可迁移到真实项目的 DRF 请求闭环，再用项目需求反复强化。
+- 节奏：每个 session 45～60 分钟；时间允许时每天最多完成 2 个 session。
+- 证据：代码、真实接线、GitHub Check 与本地 API 行为；不要求上传 Postman 结果或手工总结。
 
-| Day | 最早日期 | 业务主题 | 当天主要代码文件 | 核心能力 | 变化题 | 源码入口 |
-|---|---|---|---|---|---|---|
-| 01 | 07-24 周五 | Serializer 收尾与 HTTP 验证 | `releases/practice/day01_serializer.py` | fields、read_only、source、字段/对象校验、输入输出数据流 | prod 与非 prod 使用不同分支规则 | `run_validation`、`to_internal_value`、`to_representation` |
-| 02 | 07-27 周一 | 创建发布单完整闭环 | `releases/practice/day02_create_order.py` | `serializer.is_valid/save`、`create`、`perform_create`、后端生成字段 | 前端只传最小字段，后端补发布单号和默认状态 | `BaseSerializer.save`、`ModelSerializer.create` |
-| 03 | 07-28 周二 | 列表、详情与筛选 | `releases/practice/day03_query.py` | `ModelViewSet`、`get_queryset`、查询参数、分页、`select_related` | app/env/status/keyword 组合筛选 | `ListModelMixin.list`、`GenericAPIView.get_queryset` |
-| 04 | 07-29 周三 | 触发发布业务动作 | `releases/practice/day04_trigger.py` | `@action(detail=True)`、状态判断、幂等保护、HTTP 状态码 | CREATED 可触发，RUNNING 重复触发要拒绝 | `ViewSetMixin`、Router 动态路由 |
-| 05 | 07-30 周四 | PUT/PATCH 与修改边界 | `releases/practice/day05_update.py` | `update`、`partial_update`、`partial=True`、只读与可修改字段 | 运行中的发布单禁止修改分支 | `UpdateModelMixin.update/partial_update` |
-| 06 | 07-31 周五 | 服务层与 Jenkins 触发 | `releases/practice/day06_jenkins.py` | `services.py` 拆分、外部调用、异常转换、视图保持薄 | Jenkins 失败时状态与错误信息可解释 | DRF `APIException` 与自定义异常处理 |
-| 07 | 08-03 周一 | 回调、事务与并发 | `releases/practice/day07_callback.py` | 手动模拟 callback、`transaction.atomic`、`select_for_update`、幂等 | 同一回调重复到达不重复改变结果 | Django 事务与 QuerySet 锁定路径 |
-| 08 | 08-04 周二 | 提交与审批状态机 | `releases/practice/day08_approval.py` | submit/approve/reject、权限检查、合法状态流转 | 非待审批状态不能 approve | `APIView.initial`、`check_permissions`、`@action` |
-| 09 | 08-05 周三 | cancel/retry/logs/batch-trigger | `releases/practice/day09_actions.py` | detail/collection action、不同 Serializer、日志只读接口 | 只允许 FAILED 重试；批量操作逐项返回结果 | `get_serializer_class`、`ReadOnlyModelViewSet` |
-| 10 | 08-06 周四 | 闭卷复写最小发布中心 | `releases/practice/day10_rebuild.py` | 从 model 到 router 重建 create/list/filter/trigger/callback，完整 Postman 回归 | 更换一个业务字段或状态规则后重新跑通 | 从 `APIView.dispatch` 串起完整请求链 |
+## 为什么调整
 
-## 每日代码文件统一格式
+旧方案把“每天建分支、等 Review、等合并、维护文档”放大成了主要成本，导致一个已经掌握的知识点也要占用一整天。新的方法把重复时间用于短回忆，把新时间用于完整业务闭环：每次只增加一个决策点，并马上接到真实 HTTP 接口。
 
-每个 `dayXX_*.py` 文件必须包含：
+## 五站核心路线
 
-1. 顶部写启动命令、接口地址和本地验证方式。
-2. 按顺序写 `[TASK]`，用户从上往下完成。
-3. 每个 TASK 紧邻对应 `[CHECK]` 或 Postman 场景。
-4. 提示按 `[HINT-1/2/3]` 渐退，不提前给完整实现。
-5. 只列当天直接相关的 `[SOURCE]`。
-6. 占位实现标为 `[BASELINE]`，保证能启动但不会让全部业务场景直接通过。
-7. 文件必须被当天 View/URL 实际 import，GitHub Check 验证接线。
+| Session | 状态 | 主要代码文件 | 业务闭环 | 必须掌握 | 预计用时 |
+|---|---|---|---|---|---|
+| Day01 | 已完成并合入 main | `releases/practice/day01_serializer.py` | 输入边界与校验 | fields、read_only、字段/对象校验、输入输出数据流 | 已完成 |
+| Day02 | 当前 | `releases/practice/day02_create_order.py` | 创建发布单 | `is_valid/save`、`create`、`perform_create`、后端生成字段 | 45～60 分钟 |
+| Day03 | Day02 验收后在同一 PR 接入 | `releases/practice/day03_query_update.py` | 查询、筛选与修改边界 | `get_queryset`、查询参数、`select_related`、PUT/PATCH、`partial` | 60 分钟 |
+| Day04 | Day03 验收后在同一 PR 接入 | `releases/practice/day04_actions.py` | 触发发布与审批动作 | `@action`、权限、状态判断、幂等、service 边界、异常转换 | 60～75 分钟 |
+| Day05 | Day04 验收后在同一 PR 接入 | `releases/practice/day05_callback.py` | Jenkins 回调与并发闭环 | `transaction.atomic`、`select_for_update`、重复回调、成功/失败状态 | 60～75 分钟 |
 
-## 每日固定结构
+Day02～Day05 共用 `practice/day02-core-sprint` 和一个 Draft PR。每一站通过后直接在同一分支切换当前代码入口，不等待日级 PR 合并。Day05 全部通过后才把该 PR 标记为 Ready。
 
-1. 10 分钟：拉分支、启动服务、打开当天代码文件。
-2. 40 分钟：按文件内 TASK 逐项独立实现。
-3. 30 分钟：按 CHECK 逐场景 Postman 验证，边改边验。
-4. 20 分钟：完成变化题并追踪一个直接相关源码点。
-5. 20 分钟：本地确认结果、commit、push，等待 PR Review；无需上传 Postman 记录。
+## 每次练习的最优结构
 
-## 十天结束标准
+1. 5～8 分钟主动回忆：不看旧文件，口述上一站的请求调用链或写出核心类/方法签名。
+2. 25～30 分钟实现：只改当天一个 `releases/practice/dayXX_*.py`。
+3. 10 分钟本地 Postman：一个正常场景、一个边界场景、一个失败场景；无问题不上传。
+4. 5～10 分钟源码定位：只追本次直接相关的 1～3 个方法，不通读源码。
+5. 5 分钟一次 commit + push，然后在 Chat 说“DayXX 已提交”。
 
-- 能从需求自然判断应写在 Serializer、ViewSet、`@action` 还是 service。
-- 能独立完成 ReleaseOrder 创建、查询、筛选、修改、业务动作、回调和状态流转。
-- 能正确使用事务与 `select_for_update()` 处理重复回调/并发状态更新。
-- 能通过 traceback 和调用链定位问题，而不是盲目搜索依赖源码。
-- 仓库中保留十天代码、精简总结和可回看的 PR Review；Postman 结果只需本地验证。
+如果核心行为第一次就正确，不再追加格式性作业。若使用了大量提示，只把该小段加入下一站开头的 5 分钟闭卷复写，不让整条路线停一天。
+
+## 验收与前进规则
+
+满足以下四项即可进入下一站：
+
+- 当天核心代码满足任务行为。
+- 当前 View/URL 实际使用当天文件。
+- GitHub Check 绿色。
+- 没有未解决的 `[BLOCKER]`，且学习者没有反馈本地请求失败。
+
+以下都不是推进门槛：Postman 截图、结果文件、手工总结、固定提交数量、等待下一个整点 Review。
+
+## Day05 后立即进入真实项目
+
+不再继续为“学完十天”而模拟。直接把真实发布项目拆成四个纵向切片：
+
+1. 创建发布单：模型、Serializer、ViewSet、数据库落单。
+2. 触发 Jenkins：service 封装、超时/异常、状态更新。
+3. 回调闭环：鉴权、幂等、事务、日志与失败信息。
+4. Vue 联调：创建、列表、详情、触发、状态刷新和错误展示。
+
+每个切片沿用同一套小闭环：需求契约 → 最小实现 → 本地请求 → Review → 下一切片。遇到真实错误时再补相关 DRF 知识，比预先横向学完所有 API 更快、更牢。
+
+## 结束标准
+
+- 能从需求判断逻辑应放在 Serializer、ViewSet、`@action` 还是 service。
+- 能独立完成 ReleaseOrder 的创建、查询/修改、业务动作和回调状态流转。
+- 能用事务与行锁处理重复回调和并发更新。
+- 能根据请求生命周期和 traceback 定位问题，而不是靠照抄完整答案。
