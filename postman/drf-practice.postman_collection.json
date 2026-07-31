@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "7a0a0d8f-1e76-4d33-a2a3-2d40c76e0724",
     "name": "drf-practice",
-    "description": "DRF 发布中心每日练习。先看任务文档中的预期，再手工执行请求并记录真实结果。",
+    "description": "DRF 发布中心核心冲刺。请求只在本地执行；无问题无需上传结果，失败时直接反馈请求与响应。",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -231,6 +231,114 @@
               ]
             },
             "description": "预期 200；每条记录同时包含 status 与 status_display。"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Day02 - 创建发布单",
+      "description": "核心冲刺第 1 站：后端生成 release_no，模型维护默认状态。",
+      "item": [
+        {
+          "name": "01 最小业务输入创建",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"app_code\": \" DMS-MDM \",\n  \"app_name\": \"主数据服务\",\n  \"env_name\": \"test\",\n  \"branch_name\": \"feature/day02\",\n  \"jenkins_job_name\": \"dms-mdm-test-pipeline\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/release-orders/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "release-orders",
+                ""
+              ]
+            },
+            "description": "预期 201；release_no 由后端生成且以 RO- 开头，status 为 CREATED，app_code 规范化为 dms-mdm。"
+          },
+          "response": []
+        },
+        {
+          "name": "02 连续再次创建",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"app_code\": \"dms-mdm\",\n  \"app_name\": \"主数据服务\",\n  \"env_name\": \"test\",\n  \"branch_name\": \"feature/day02-repeat\",\n  \"jenkins_job_name\": \"dms-mdm-test-pipeline\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/release-orders/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "release-orders",
+                ""
+              ]
+            },
+            "description": "紧接场景 01 执行。预期仍为 201，且 release_no 与上一条不同；基线常量会在这里暴露问题。"
+          },
+          "response": []
+        },
+        {
+          "name": "03 客户端伪造后端字段",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"release_no\": \"CLIENT-MUST-NOT-WIN\",\n  \"status\": \"SUCCESS\",\n  \"app_code\": \"dms-mdm\",\n  \"app_name\": \"主数据服务\",\n  \"env_name\": \"prod\",\n  \"branch_name\": \"release/day02\",\n  \"jenkins_job_name\": \"dms-mdm-prod-pipeline\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/release-orders/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "release-orders",
+                ""
+              ]
+            },
+            "description": "预期 201；release_no 不是 CLIENT-MUST-NOT-WIN，status 仍为 CREATED。"
           },
           "response": []
         }
