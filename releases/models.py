@@ -6,7 +6,7 @@ class ReleaseOrder(models.Model):
 
     class Status(models.TextChoices):
         CREATED = "CREATED", "待触发"
-        TRIGGRTING = "TRIGGRTING", "触发中"
+        TRIGGERING = "TRIGGERING", "触发中"
         RUNNING = "RUNNING", "运行中"
         SUCCESS = "SUCCESS", "成功"
         FAILED = "FAILED", "失败"
