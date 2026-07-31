@@ -1,125 +1,110 @@
-# DRF GitHub 驱动学习工作流
+# DRF GitHub 核心冲刺工作流
 
 ## 目标
 
-把每日准备、编码、本地 Postman 验证、自动检查、逐行 Review 和最终验收串成一个快速闭环。用户拉取分支后，首先打开当天的可运行代码文件，直接根据代码注释完成练习；任务文档只做索引和验收补充，不再作为主要操作入口。Postman 结果默认只保留在本地，不要求填写结果表、截图或上传响应。
+把学习主线压缩为“一个代码入口 → 本地 API 验证 → push → 即时 Review → 下一核心点”。代码是练习主体；文档、Postman 记录和固定日历都不能拖住推进。
+
+## 当前分支策略
+
+- `main`：保存已完成的大阶段结果。
+- Day01 已验收并合入 `main`。
+- `practice/day02-core-sprint`：Day02～Day05 共用的唯一活动分支与 Draft PR。
+- 同一时刻只接入一个 `releases/practice/dayXX_*.py`，上一站验收后在同一分支切换下一站。
+- 不再要求每个 Day 单独建 PR、等待合并后才能继续。
+- Day05 完成后，才把滚动 PR 标为 Ready；仍由用户决定何时合并。
 
 ## 固定分工
 
 | 位置 | 负责内容 |
 |---|---|
-| Work + GitHub | 检查进度、创建当天可运行代码骨架、维护 Draft PR、逐行 Review、最终验收 |
-| 当天代码文件 | 写明 TASK、CHECK、渐退式提示和源码入口，是用户当天唯一主要入口 |
-| 本地仓库 | 修改当天代码、启动 Django、用 Postman 边改边验、提交和 push |
-| GitHub Actions | 每次 push 做语法、Django system check、迁移检查，并确认练习文件已接入运行路径 |
-| Chat | 用于系统解释，以及本地 Postman 发现问题时直接反馈请求、响应和报错 |
+| Work + GitHub | 准备可运行骨架、切换当前接线、维护一个滚动 Draft PR、Review 与阶段验收 |
+| 当天代码文件 | 唯一主要入口，包含 TASK、CHECK、渐退式提示、WHY、SOURCE 与 BASELINE |
+| 本地仓库 | 写核心代码、启动 Django、运行 Postman、一次提交并 push |
+| GitHub Actions | 每次 push 检查语法、Django 配置、迁移和当前入口接线 |
+| Chat | push 后立即请求 Review；本地请求失败时反馈最小请求与错误响应 |
 
-## 分支与 PR 规则
+## 代码入口要求
 
-- `main`：只保存已经验收的结果。
-- 每次只保留一个活动分支：`practice/dayXX-topic`。
-- 当天分支创建后立即建立 Draft PR，后续 Review 全部留在该 PR。
-- 前一天未验收，不创建下一天的分支、代码文件或任务。
-- 验收通过后才把 PR 标为 Ready；不自动合并。
+当前文件必须：
 
-## 代码优先原则
+1. 可导入，`python manage.py check` 能运行。
+2. 被真实 View/URL 使用，不能只是孤立练习文件。
+3. 从上到下包含 `[TASK]`、`[CHECK]`、`[HINT-1/2/3]`、`[WHY]`、`[SOURCE]`、`[BASELINE]`。
+4. 基线能启动，但至少一个关键业务场景故意不通过。
+5. 只准备非核心接线，不替学习者提交核心答案。
 
-每天必须先创建一个真正可运行、已接入 URL/ViewSet 的代码练习文件，再补文档：
+## 45～60 分钟闭环
 
 ~~~text
-releases/practice/dayXX_topic.py      当天唯一主要入口，包含可运行占位代码和行内任务
-releases/views.py / releases/urls.py  只做必要接线，不包含核心答案
-docs/tasks/dayXX-*.md                 时间安排、入口索引和完整验收清单
-docs/results/dayXX-postman.md         可选本地检查模板，不要求填写或提交
-postman/drf-practice...json           可直接执行的请求
-Draft PR                              逐行 Review 与最终验收入口
+5～8 分钟：闭卷回忆上一站的调用链或核心签名
+25～30 分钟：只修改当前一个代码文件
+10 分钟：本地 Postman 跑正常、边界、失败场景
+5～10 分钟：只追当前直接相关的源码入口
+5 分钟：一次 commit + push，立即在 Chat 请求 Review
 ~~~
 
-代码文件必须满足：
+时间允许可在同一天完成两个 session，但每天最多两站，避免只追速度而没有回忆间隔。
 
-1. 拉取后可导入，`python manage.py check` 能运行。
-2. 已接入当天真实 HTTP 接口，不能再次出现“文件存在但未被 import”的情况。
-3. 文件顶部直接写启动方式、接口地址和本地验证方式。
-4. 按顺序标注 `[TASK]`、`[CHECK]`、`[HINT-1/2/3]`、`[WHY]`、`[SOURCE]`。
-5. 占位实现必须明确标记 `[BASELINE]`，可以启动，但在完成任务前应有业务场景不通过。
-6. 只准备非核心接线和最小占位，不提前提交当天核心题目的完整答案。
-7. 旧日答案可以保留在 Git 历史或旧文件中，但当天入口不得直接继承完整答案；任务文件应要求先闭卷完成。
+不再要求每个 TASK 单独 commit。一次 session 一个清晰提交即可。
 
-## 十日代码文件约定
+## Postman 与总结
 
-只在上一日合入 main 后创建下一项：
+- Postman 只在本地运行；无问题时不填写、不截图、不上传结果。
+- 发生问题时，直接反馈请求名、方法、URL、请求体、实际状态码与错误响应。
+- 总结由 Work 根据代码和 Review 精简维护，不要求学习者先改文档。
+- 口述调用链用于强化记忆，但不是拖住下一站的形式门槛。
 
-| Day | 当天主要代码文件 |
-|---|---|
-| 01 | `releases/practice/day01_serializer.py` |
-| 02 | `releases/practice/day02_create_order.py` |
-| 03 | `releases/practice/day03_query.py` |
-| 04 | `releases/practice/day04_trigger.py` |
-| 05 | `releases/practice/day05_update.py` |
-| 06 | `releases/practice/day06_jenkins.py` |
-| 07 | `releases/practice/day07_callback.py` |
-| 08 | `releases/practice/day08_approval.py` |
-| 09 | `releases/practice/day09_actions.py` |
-| 10 | `releases/practice/day10_rebuild.py` |
+## Review 与验收
 
-## 渐退式提示
+用户 push 后直接在 Chat 说“DayXX 已提交”，立即触发 Review；定时检查只作为漏检兜底，不必等待下一个整点。
 
-1. L0：代码中只给业务目标、输入输出和验收场景。
-2. L1：指出应该使用的 DRF 层或方法。
-3. L2：给判断结构或伪代码。
-4. L3：同一问题经过两次修改仍不通过时，才在 PR Review 中给最小参考片段。
+Review 仍使用：
 
-Review 优先使用 PR 行内评论，不直接改学习者的核心答案：
-
-- `[BLOCKER]`：不修复不能验收。
+- `[BLOCKER]`：真实行为错误，不修复不能前进。
 - `[FIX]`：明确错误与最小修改方向。
-- `[HINT-1/2/3]`：按级别给提示。
-- `[WHY]`：要求解释原因。
-- `[SOURCE]`：值得追踪的 DRF/Django 源码入口。
+- `[HINT-1/2/3]`：按需逐级揭示。
+- `[WHY]`：解释责任边界或运行原因。
+- `[SOURCE]`：只指向直接相关源码。
 
-## 边改边验闭环
+一站满足以下条件就立即接下一站：
 
-~~~text
-打开当天一个代码文件
-  -> 完成一个 TASK
-  -> 只跑对应 CHECK/Postman 请求
-  -> 通过后 commit + push
-  -> GitHub Check 自动反馈
-  -> Work 在 Draft PR 行内 Review
-  -> 根据评论继续修改
-~~~
+- 核心代码符合接口行为；
+- 当前 View/URL 已使用该文件；
+- GitHub Check 绿色；
+- 无未解决 `[BLOCKER]`；
+- 学习者未反馈本地 Postman 错误。
 
-GitHub Check 负责确认文件已接入且代码能安全启动；业务结果由学习者在本地用 Postman 验证。无问题无需上传任何记录；有问题时直接反馈请求方法、URL、请求体、实际状态码和错误响应。
+Postman 上传记录、手工总结、固定提交数、等待当前 PR 合并都不是推进门槛。
 
-## 每日验收
+## 用户操作
 
-每一天的推进门槛简化为：
-
-- 当天核心代码已在指定练习文件完成。
-- 练习文件确实被当前 View/URL import 使用。
-- 学习者已在本地执行约定的 Postman 场景；未反馈问题即按本地验证通过处理，无需上传结果。
-- GitHub Check 绿色。
-- 至少一个变化题已完成。
-- Draft PR 中没有未解决的 `[BLOCKER]`。
-
-总结与知识点由 Work 根据代码、Review 和反馈补充，不再要求学习者先修改文档才能进入下一天。口述调用链和源码追踪用于强化掌握，不作为拖住进度的硬门槛。
-
-## 用户每天只需执行
+首次切到核心冲刺分支：
 
 ~~~bash
 git fetch origin
-git switch <当天分支>
-git pull --ff-only
+git switch --track origin/practice/day02-core-sprint
 python manage.py migrate
 python manage.py runserver
 ~~~
 
-然后只打开任务文档最上方指定的 `releases/practice/dayXX_*.py`。完成一个小点后：
+已经有本地分支时：
+
+~~~bash
+git switch practice/day02-core-sprint
+git pull --ff-only
+python manage.py runserver
+~~~
+
+完成当前 session 后：
 
 ~~~bash
 git add releases/practice/dayXX_*.py
-git commit -m "practice(dayXX): <本次小目标>"
+git commit -m "practice(dayXX): complete core task"
 git push
 ~~~
 
-不需要把 Git commit、Postman 结果或整份代码重新粘贴到 Chat；GitHub 会直接读取并 Review。本地验证失败时，只需直接反馈最小可复现请求和错误响应。
+然后直接在 Chat 说“DayXX 已提交”。不要粘贴整份代码；若 Postman 失败，只贴最小错误信息。
+
+## 核心冲刺之后
+
+Day05 通过并合入后，不再为补齐模拟天数停留。直接转入真实发布项目的创建发布单、Jenkins 触发、回调事务和 Vue 联调四个纵向切片；遇到知识缺口再做 15～30 分钟针对性练习。
